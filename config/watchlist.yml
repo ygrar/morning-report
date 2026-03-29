@@ -73,7 +73,7 @@ jp_stocks:
   indices:
     - ticker: "^N225"
       name: "日経225"
-    - ticker: "^TOPX"          # GitHub Actionsで動作。ローカル失敗時は―表示
+    - ticker: "^TOPX"
       name: "TOPIX"
   fx:
     - ticker: "USDJPY=X"

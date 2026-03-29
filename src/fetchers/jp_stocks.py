@@ -1,6 +1,7 @@
 """日本株・為替データ取得モジュール"""
 import yfinance as yf
 import pandas as pd
+import requests
 import pytz
 from typing import Optional
 
@@ -56,10 +57,35 @@ def _fetch_fx_ny_close(ticker: str) -> Optional[dict]:
         return None
 
 
+def _fetch_topix_stooq() -> Optional[dict]:
+    """stooq から TOPIX 実値を取得"""
+    try:
+        url = "https://stooq.com/q/d/l/?s=^tpx&i=d"
+        resp = requests.get(url, timeout=10)
+        resp.raise_for_status()
+        from io import StringIO
+        df = pd.read_csv(StringIO(resp.text))
+        df = df.dropna(subset=["Close"]).sort_values("Date")
+        if len(df) < 2:
+            return None
+        latest = float(df.iloc[-1]["Close"])
+        prev = float(df.iloc[-2]["Close"])
+        return {
+            "price": round(latest, 2),
+            "change": round(latest - prev, 2),
+            "pct": _pct(latest, prev),
+        }
+    except Exception:
+        return None
+
+
 def fetch_indices(indices: list[dict]) -> list[dict]:
     results = []
     for item in indices:
-        data = _fetch_ticker(item["ticker"])
+        if item["ticker"] == "^TOPX":
+            data = _fetch_topix_stooq()
+        else:
+            data = _fetch_ticker(item["ticker"])
         if data:
             results.append({"name": item["name"], "ticker": item["ticker"], **data})
         else:
