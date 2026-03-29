@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pip install:*)",
+      "Bash(python main.py)",
+      "Bash(python -c \"import sys; print\\(sys.executable\\)\")",
+      "Bash(where python3:*)",
+      "Bash(where python:*)",
+      "Read(//c/Users/ygrar/AppData/Local/Programs/Python//**)",
+      "Bash(PY=\"/c/Users/ygrar/AppData/Local/Programs/Python/Python313/python.exe\")",
+      "Bash($PY -m pip install yfinance pandas requests anthropic PyYAML pytz -q)",
+      "Bash(/c/Users/ygrar/AppData/Local/Programs/Python/Python313/python.exe main.py)",
+      "Bash(PYTHONIOENCODING=utf-8 /c/Users/ygrar/AppData/Local/Programs/Python/Python313/python.exe src/main.py)"
+    ]
+  }
+}
