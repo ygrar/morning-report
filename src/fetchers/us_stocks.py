@@ -5,6 +5,14 @@ import requests
 from io import StringIO
 from typing import Optional
 
+# ブラウザに見せかけたセッション（GitHub Actions でのブロック回避）
+_YF_SESSION = requests.Session()
+_YF_SESSION.headers["User-Agent"] = (
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+    "AppleWebKit/537.36 (KHTML, like Gecko) "
+    "Chrome/124.0.0.0 Safari/537.36"
+)
+
 
 def _pct(current: float, prev: float) -> float:
     if prev == 0:
@@ -71,9 +79,9 @@ def _fetch_ticker(yf_ticker: str) -> Optional[dict]:
     data = _fetch_stooq(stooq_ticker)
     if data:
         return data
-    # フォールバック: yfinance
+    # フォールバック: yfinance（ブラウザセッション使用）
     try:
-        t = yf.Ticker(yf_ticker)
+        t = yf.Ticker(yf_ticker, session=_YF_SESSION)
         hist = t.history(period="5d")
         if hist.empty or len(hist) < 2:
             return None
@@ -145,7 +153,7 @@ def _screen_sp500(threshold: float) -> list[dict]:
     results = []
     batch = " ".join(tickers[:100])
     try:
-        data = yf.download(batch, period="5d", progress=False, auto_adjust=True)
+        data = yf.download(batch, period="5d", progress=False, auto_adjust=True, session=_YF_SESSION)
         closes = data["Close"]
         for ticker in closes.columns:
             col = closes[ticker].dropna()
